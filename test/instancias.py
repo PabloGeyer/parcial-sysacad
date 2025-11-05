@@ -12,12 +12,10 @@ from app.services import (
     TipoEspecialidadService, UniversidadService
 )
 
-def nuevotipodocumento(dni=46291002, libreta_civica="nacional", libreta_enrolamiento="naci", pasaporte="nacnal"):
+def nuevotipodocumento(sigla="DNI", nombre="Documento Nacional de Identidad"):
     tipo_documento = TipoDocumento()
-    tipo_documento.dni = dni
-    tipo_documento.libreta_civica = libreta_civica
-    tipo_documento.libreta_enrolamiento = libreta_enrolamiento
-    tipo_documento.pasaporte = pasaporte
+    tipo_documento.sigla = sigla
+    tipo_documento.nombre = nombre
     TipoDocumentoService.crear(tipo_documento)
     return tipo_documento
 

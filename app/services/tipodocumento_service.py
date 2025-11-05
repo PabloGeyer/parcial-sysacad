@@ -20,10 +20,8 @@ class TipoDocumentoService:
         tipodocumento_existente = TipoDocumentoRepository.buscar_por_id(id)
         if not tipodocumento_existente:
             return None
-        tipodocumento_existente.dni = tipodocumento.dni
-        tipodocumento_existente.libreta_civica = tipodocumento.libreta_civica
-        tipodocumento_existente.libreta_enrolamiento = tipodocumento.libreta_enrolamiento
-        tipodocumento_existente.pasaporte = tipodocumento.pasaporte
+        tipodocumento_existente.sigla = tipodocumento.sigla
+        tipodocumento_existente.nombre = tipodocumento.nombre
         return TipoDocumentoRepository.actualizar(tipodocumento_existente)
     
     @staticmethod

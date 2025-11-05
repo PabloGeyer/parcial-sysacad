@@ -3,7 +3,12 @@ from io import BytesIO
 import os
 from flask import current_app, render_template, url_for
 from python_odt_template import ODTTemplate
-from weasyprint import HTML
+try:
+    from weasyprint import HTML
+    WEASYPRINT_AVAILABLE = True
+except (ImportError, OSError):
+    WEASYPRINT_AVAILABLE = False
+    HTML = None
 from python_odt_template.jinja import get_odt_renderer
 from docxtpl import DocxTemplate
 import jinja2
@@ -18,6 +23,9 @@ class PDFDocument(Document):
 
     @staticmethod
     def generar(carpeta: str, plantilla: str, context: dict) ->BytesIO:
+        if not WEASYPRINT_AVAILABLE:
+            raise RuntimeError("WeasyPrint no está disponible. Para generar PDFs, instala GTK+ en Windows o usa un ambiente Linux.")
+        
         html_string = render_template(f'{carpeta}/{plantilla}.html', 
                                 context=context)        
         
