@@ -2,27 +2,20 @@ import datetime
 from io import BytesIO
 from app.models import Alumno
 from app.repositories import AlumnoRepository
-from app.services.documentos_office_service import PDFDocument, ODTDocument, DOCXDocument, Document, obtener_tipo_documento
+from app.services.documentos_office_service import obtener_tipo_documento
+from app.services.base_service import BaseService
 
-class AlumnoService:
 
-    @staticmethod
-    def crear(alumno):
-        AlumnoRepository.crear(alumno)
-
-    @staticmethod
-    def buscar_por_id(id: int) -> Alumno:        
-        return AlumnoRepository.buscar_por_id(id)
-
-    @staticmethod
-    def buscar_todos() -> list[Alumno]:
-        return AlumnoRepository.buscar_todos()
+class AlumnoService(BaseService[Alumno, AlumnoRepository]):
+    """
+    Servicio para lógica de negocio de Alumno.
+    Hereda operaciones CRUD de BaseService y agrega funcionalidad específica.
+    """
+    repository = AlumnoRepository
     
-    @staticmethod
-    def actualizar(id: int, alumno: Alumno) -> Alumno:
-        alumno_existente = AlumnoRepository.buscar_por_id(id)
-        if not alumno_existente:
-            return None
+    @classmethod
+    def actualizar_campos(cls, alumno_existente: Alumno, alumno: Alumno):
+        """Actualiza los campos específicos de Alumno."""
         alumno_existente.nombre = alumno.nombre
         alumno_existente.apellido = alumno.apellido
         alumno_existente.nrodocumento = alumno.nrodocumento
@@ -32,19 +25,15 @@ class AlumnoService:
         alumno_existente.nro_legajo = alumno.nro_legajo
         alumno_existente.fecha_ingreso = alumno.fecha_ingreso
         alumno_existente.especialidad = alumno.especialidad
-        return AlumnoRepository.actualizar(alumno_existente)
-        
-    @staticmethod
-    def borrar_por_id(id: int) -> bool:
-        return AlumnoRepository.borrar_por_id(id)
     
-    @staticmethod
-    def generar_certificado_alumno_regular(id: int,tipo: str)-> BytesIO:
-        alumno = AlumnoRepository.buscar_por_id(id)
+    @classmethod
+    def generar_certificado_alumno_regular(cls, id: int, tipo: str) -> BytesIO:
+        """Genera un certificado de alumno regular en el formato especificado."""
+        alumno = cls.repository.buscar_por_id(id)
         if not alumno:
             return None
         
-        context = AlumnoService.__obteneralumno(alumno)
+        context = cls._obtener_contexto_alumno(alumno)
         documento = obtener_tipo_documento(tipo)
         if not documento:
             return None
@@ -56,20 +45,21 @@ class AlumnoService:
         )
     
     @staticmethod
-    def __obtener_fechaactual():
+    def _obtener_fecha_actual() -> str:
+        """Retorna la fecha actual formateada."""
         fecha_actual = datetime.datetime.now()
-        fecha_str = fecha_actual.strftime('%d de %B de %Y')
-        return fecha_str
+        return fecha_actual.strftime('%d de %B de %Y')
 
-    @staticmethod
-    def __obteneralumno(alumno: Alumno) -> dict:
+    @classmethod
+    def _obtener_contexto_alumno(cls, alumno: Alumno) -> dict:
+        """Prepara el contexto para generar documentos del alumno."""
         especialidad = alumno.especialidad
         facultad = especialidad.facultad
         universidad = facultad.universidad
-        return{
+        return {
             "alumno": alumno,
             "especialidad": especialidad,
             "facultad": facultad,
             "universidad": universidad,
-            "fecha":AlumnoService.__obtener_fechaactual()
+            "fecha": cls._obtener_fecha_actual()
         }

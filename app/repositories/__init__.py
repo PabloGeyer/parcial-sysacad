@@ -1,3 +1,4 @@
+from .base_repository import BaseRepository
 from .grado_repositorio import GradoRepository
 from .universidad_repositorio import UniversidadRepository
 from .tipodocumento_repositorio import TipoDocumentoRepository
