@@ -1,5 +1,5 @@
 from app import db
-from app.models import Especialidad
+from app.models import Especialidad, Alumno
 
 class EspecialidadRepository:
 
@@ -31,3 +31,10 @@ class EspecialidadRepository:
         db.session.commit()
         return True
 
+    @staticmethod
+    def buscar_alumnos_por_especialidad(especialidad_id: int) -> list[Alumno]:
+        """
+        Busca todos los alumnos que pertenecen a una especialidad específica.
+        SRP: Este método solo se encarga de la consulta a la base de datos.
+        """
+        return db.session.query(Alumno).filter_by(especialidad_id=especialidad_id).all()
